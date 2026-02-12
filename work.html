@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Work · Hanung Gerry Purwaka</title>
+    <meta name="description" content="Work details" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="talk-page">
+    <header class="site-header">
+      <div class="container nav-bar">
+        <a class="brand" href="index.html">
+          <img class="brand-logo" src="assets/logo.webp" alt="Hello, I'm Gerry" />
+          <span class="brand-name">Hanung Gerry Purwaka</span>
+        </a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          <img src="assets/hamburger-icon.svg" alt="Open menu" />
+        </button>
+        <nav id="site-nav" class="site-nav">
+          <a href="index.html">Home</a>
+          <a href="all-works.html">All Works</a>
+          <a href="talks.html">Talks</a>
+          <a href="about.html">About Me</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-intro">
+        <div class="container">
+          <h1 id="work-title">Work</h1>
+          <hr />
+        </div>
+      </section>
+
+      <section class="page-content">
+        <div class="container talk-detail">
+          <div class="talk-figure">
+            <img id="work-image" src="" alt="" />
+          </div>
+          <div class="talk-body">
+            <p id="work-description" class="muted">Loading...</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-bar">
+        <nav class="footer-nav" aria-label="Footer">
+          <a href="index.html">Home</a>
+          <a href="all-works.html">All Works</a>
+          <a href="talks.html">Talks</a>
+          <a href="about.html">About Me</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script>
+      const toggle = document.querySelector(".menu-toggle");
+      const nav = document.getElementById("site-nav");
+      if (toggle && nav) {
+        toggle.addEventListener("click", () => {
+          const isOpen = document.body.classList.toggle("nav-open");
+          toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        });
+      }
+
+      const SHEET_PUBLISHED_ID =
+        "2PACX-1vQxj47Ft36-DJffBs6j9p-g7DmJSEFnhHq2I91zytwv1QXb4s1kCnhfq63VRx1TyL999_WLp51NitM-";
+      const SHEET_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_PUBLISHED_ID}/pub?output=csv`;
+
+      function parseCsv(text) {
+        const rows = [];
+        let row = [];
+        let field = "";
+        let inQuotes = false;
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i];
+          const next = text[i + 1];
+          if (char === '"') {
+            if (inQuotes && next === '"') {
+              field += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (char === "," && !inQuotes) {
+            row.push(field);
+            field = "";
+          } else if ((char === "\n" || char === "\r") && !inQuotes) {
+            if (char === "\r" && next === "\n") {
+              i++;
+            }
+            row.push(field);
+            if (row.length > 1 || row[0] !== "") {
+              rows.push(row);
+            }
+            row = [];
+            field = "";
+          } else {
+            field += char;
+          }
+        }
+        if (field.length || row.length) {
+          row.push(field);
+          rows.push(row);
+        }
+        return rows;
+      }
+
+      function normalizeKey(value) {
+        return String(value || "")
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, "_");
+      }
+
+      function getSlug() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("slug");
+      }
+
+      async function loadWork() {
+        const slug = getSlug();
+        const titleEl = document.getElementById("work-title");
+        const imageEl = document.getElementById("work-image");
+        const descEl = document.getElementById("work-description");
+        if (!slug) {
+          descEl.textContent = "Work not found.";
+          return;
+        }
+        try {
+          const res = await fetch(SHEET_URL);
+          if (!res.ok) throw new Error("Sheet fetch failed");
+          const text = await res.text();
+          const rows = parseCsv(text);
+          if (!rows.length) throw new Error("No data");
+          const headers = rows[0].map(normalizeKey);
+          const items = rows.slice(1).map((row) => {
+            const item = {};
+            headers.forEach((key, index) => {
+              item[key] = row[index] ? row[index].trim() : "";
+            });
+            return item;
+          });
+          const work = items.find((item) => {
+            const itemSlug =
+              item.slug || item.title.toLowerCase().replace(/\s+/g, "-");
+            return itemSlug === slug;
+          });
+          if (!work) {
+            descEl.textContent = "Work not found.";
+            return;
+          }
+          titleEl.textContent = work.title || "Work";
+          document.title = `${work.title || "Work"} · Hanung Gerry Purwaka`;
+          imageEl.src = work.image_url || "";
+          imageEl.alt = work.title || "Work image";
+          descEl.textContent = work.description || "Details coming soon.";
+        } catch (err) {
+          descEl.textContent = "Work not found.";
+        }
+      }
+
+      loadWork();
+    </script>
+  </body>
+</html>

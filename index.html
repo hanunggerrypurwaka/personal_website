@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Hanung Gerry Purwaka</title>
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-bar">
+        <a class="brand" href="#">
+          <img class="brand-logo" src="assets/logo.webp" alt="Hello, I'm Gerry" />
+          <span class="brand-name">Hanung Gerry Purwaka</span>
+        </a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          <img src="assets/hamburger-icon.svg" alt="Open menu" />
+        </button>
+        <nav id="site-nav" class="site-nav">
+          <a href="#">Home</a>
+          <a href="all-works.html">All Works</a>
+          <a href="talks.html">Talks</a>
+          <a href="about.html">About Me</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+      <div class="container hero">
+        <h1>Hello, I'm Gerry</h1>
+      </div>
+    </header>
+
+    <main>
+      <section class="section section-light">
+        <div class="container intro">
+          <h2>I like making things and meeting new people</h2>
+          <img class="intro-portrait" src="assets/intro.webp" alt="Illustration of Gerry" />
+          <p>
+            I'm a humble <strong>game designer</strong> who loves working with
+            others to create fun, engaging experiences.
+          </p>
+          <p>Thanks for stopping by!</p>
+          <p class="muted">(Note: I don't actually have 6 arms)</p>
+          <div class="callout">
+            <span class="callout-emoji" aria-hidden="true">🚧</span>
+            <span>Note: This site is under construction</span>
+          </div>
+          <a class="btn" href="contact.html">hello@hanungpurwaka.com</a>
+          <hr />
+        </div>
+      </section>
+
+      <section class="section section-muted">
+        <div class="container about">
+          <div class="about-media">
+            <img src="assets/about.webp" alt="About me illustration" />
+          </div>
+          <div class="about-body">
+            <h2>About Me</h2>
+            <p>
+              I began my professional journey in 2011 and have since worked on a
+              number collaborative projects. Over the years, I've been lucky to
+              work with so many wonderful partners by providing a variety of
+              services to fit their needs. I take pride in all that I do and in
+              the long-term relationships I've fostered in the process.
+            </p>
+            <a class="btn" href="about.html">Learn More</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-light">
+        <div class="container banner">
+          <img src="assets/banner.webp" alt="Banner artwork" />
+        </div>
+      </section>
+
+      <section class="section section-muted">
+        <div class="container works">
+          <h2>Selected Works</h2>
+          <div id="works-grid" class="grid"></div>
+          <p id="works-empty" class="muted" hidden>No works yet.</p>
+          <a class="btn" href="all-works.html">Explore All Works</a>
+        </div>
+      </section>
+
+      <section class="section section-light">
+        <div class="container contact">
+          <div class="contact-media">
+            <img
+              src="https://cdn.popsy.co/images/https%3A%2F%2Fwww.notion.so%2Fimage%2Fattachment%253A64a16f18-268b-40a0-9bfc-c305b4e5e65b%253Aillustra2.png%3Ftable%3Dblock%26id%3Dfd31675c-6931-4e91-b224-7be36ec6f768%26cache%3Dv2?width=1500&optimizer=image"
+              alt="Contact illustration"
+            />
+          </div>
+          <div class="contact-body">
+            <h2>Let's Make Something Awesome</h2>
+            <p>
+              I have had the great fortune of working on some inspiring projects
+              while networking with many creative individuals like you along the
+              way. Whether you have an interesting project or just want to say
+              hi, feel free to connect.
+            </p>
+            <a class="btn" href="mailto:hello@hanungpurwaka.com"
+              >hello@hanungpurwaka.com</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="container footer-bar">
+        <nav class="footer-nav" aria-label="Footer">
+          <a href="#">Home</a>
+          <a href="all-works.html">All Works</a>
+          <a href="talks.html">Talks</a>
+          <a href="about.html">About Me</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </footer>
+    <script>
+      const toggle = document.querySelector(".menu-toggle");
+      const nav = document.getElementById("site-nav");
+      if (toggle && nav) {
+        toggle.addEventListener("click", () => {
+          const isOpen = document.body.classList.toggle("nav-open");
+          toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        });
+      }
+
+      const WORKS_SHEET_PUBLISHED_ID =
+        "2PACX-1vQxj47Ft36-DJffBs6j9p-g7DmJSEFnhHq2I91zytwv1QXb4s1kCnhfq63VRx1TyL999_WLp51NitM-";
+      const WORKS_SHEET_URL = `https://docs.google.com/spreadsheets/d/e/${WORKS_SHEET_PUBLISHED_ID}/pub?output=csv`;
+
+      const worksGrid = document.getElementById("works-grid");
+      const worksEmpty = document.getElementById("works-empty");
+
+      function parseCsv(text) {
+        const rows = [];
+        let row = [];
+        let field = "";
+        let inQuotes = false;
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i];
+          const next = text[i + 1];
+          if (char === '"') {
+            if (inQuotes && next === '"') {
+              field += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (char === "," && !inQuotes) {
+            row.push(field);
+            field = "";
+          } else if ((char === "\n" || char === "\r") && !inQuotes) {
+            if (char === "\r" && next === "\n") {
+              i++;
+            }
+            row.push(field);
+            if (row.length > 1 || row[0] !== "") {
+              rows.push(row);
+            }
+            row = [];
+            field = "";
+          } else {
+            field += char;
+          }
+        }
+        if (field.length || row.length) {
+          row.push(field);
+          rows.push(row);
+        }
+        return rows;
+      }
+
+      function normalizeKey(value) {
+        return String(value || "")
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, "_");
+      }
+
+      async function loadWorks() {
+        if (!worksGrid) return;
+        try {
+          const res = await fetch(WORKS_SHEET_URL);
+          if (!res.ok) throw new Error("Sheet fetch failed");
+          const text = await res.text();
+          const rows = parseCsv(text);
+          if (!rows.length) throw new Error("No data");
+          const headers = rows[0].map(normalizeKey);
+          const items = rows.slice(1).map((row) => {
+            const item = {};
+            headers.forEach((key, index) => {
+              item[key] = row[index] ? row[index].trim() : "";
+            });
+            return item;
+          });
+          const visible = items.filter((item) => item.title && item.image_url);
+          if (!visible.length) {
+            worksEmpty.hidden = false;
+            return;
+          }
+          worksGrid.innerHTML = "";
+          visible.slice(0, 3).forEach((item) => {
+            const card = document.createElement("a");
+            card.className = "card";
+            card.href = "all-works.html";
+            card.innerHTML = `
+              <img src="${item.image_url}" alt="${item.title}" loading="lazy" />
+              <span>${item.title}</span>
+            `;
+            worksGrid.appendChild(card);
+          });
+        } catch (err) {
+          worksEmpty.hidden = false;
+        }
+      }
+
+      loadWorks();
+    </script>
+  </body>
+</html>
