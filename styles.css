@@ -411,7 +411,7 @@ hr {
 
 .contact-copy {
   font-size: 1.05rem;
-  line-height: 1.8;
+  line-height: 0.6;
   display: grid;
   gap: 18px;
   justify-items: start;
