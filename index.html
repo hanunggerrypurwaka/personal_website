@@ -5,24 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Hanung Gerry Purwaka</title>
     <meta name="description" content="" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <header class="site-header">
       <div class="container nav-bar">
         <a class="brand" href="#">
-          <img class="brand-logo" src="assets/logo.webp" alt="Hello, I'm Gerry" />
+          <img class="brand-logo" src="/assets/logo.webp" alt="Hello, I'm Gerry" />
           <span class="brand-name">Hanung Gerry Purwaka</span>
         </a>
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
-          <img src="assets/hamburger-icon.svg" alt="Open menu" />
+          <img src="/assets/hamburger-icon.svg" alt="Open menu" />
         </button>
         <nav id="site-nav" class="site-nav">
           <a href="#">Home</a>
-          <a href="all-works.html">All Works</a>
-          <a href="talks.html">Talks</a>
-          <a href="about.html">About Me</a>
-          <a href="contact.html">Contact</a>
+          <a href="/all-works/">All Works</a>
+          <a href="/talks/">Talks</a>
+          <a href="/about/">About Me</a>
+          <a href="/contact/">Contact</a>
         </nav>
       </div>
       <div class="container hero">
@@ -34,7 +34,7 @@
       <section class="section section-light">
         <div class="container intro">
           <h2>I like making things and meeting new people</h2>
-          <img class="intro-portrait" src="assets/intro.webp" alt="Illustration of Gerry" />
+          <img class="intro-portrait" src="/assets/intro.webp" alt="Illustration of Gerry" />
           <p>
             I'm a humble <strong>game designer</strong> who loves working with
             others to create fun, engaging experiences.
@@ -45,15 +45,14 @@
             <span class="callout-emoji" aria-hidden="true">🚧</span>
             <span>Note: This site is under construction</span>
           </div>
-          <a class="btn" href="contact.html">hello@hanungpurwaka.com</a>
-          <hr />
+          <a class="btn" href="/contact/">hello@hanungpurwaka.com</a>
         </div>
       </section>
 
       <section class="section section-muted">
         <div class="container about">
           <div class="about-media">
-            <img src="assets/about.webp" alt="About me illustration" />
+            <img src="/assets/about.webp" alt="About me illustration" />
           </div>
           <div class="about-body">
             <h2>About Me</h2>
@@ -64,14 +63,14 @@
               services to fit their needs. I take pride in all that I do and in
               the long-term relationships I've fostered in the process.
             </p>
-            <a class="btn" href="about.html">Learn More</a>
+            <a class="btn" href="/about/">Learn More</a>
           </div>
         </div>
       </section>
 
       <section class="section section-light">
         <div class="container banner">
-          <img src="assets/banner.webp" alt="Banner artwork" />
+          <img src="/assets/banner.webp" alt="Banner artwork" />
         </div>
       </section>
 
@@ -80,7 +79,7 @@
           <h2>Selected Works</h2>
           <div id="works-grid" class="grid"></div>
           <p id="works-empty" class="muted" hidden>No works yet.</p>
-          <a class="btn" href="all-works.html">Explore All Works</a>
+          <a class="btn" href="/all-works/">Explore All Works</a>
         </div>
       </section>
 
@@ -111,10 +110,10 @@
       <div class="container footer-bar">
         <nav class="footer-nav" aria-label="Footer">
           <a href="#">Home</a>
-          <a href="all-works.html">All Works</a>
-          <a href="talks.html">Talks</a>
-          <a href="about.html">About Me</a>
-          <a href="contact.html">Contact</a>
+          <a href="/all-works/">All Works</a>
+          <a href="/talks/">Talks</a>
+          <a href="/about/">About Me</a>
+          <a href="/contact/">Contact</a>
         </nav>
       </div>
     </footer>
@@ -206,7 +205,8 @@
           visible.slice(0, 3).forEach((item) => {
             const card = document.createElement("a");
             card.className = "card";
-            card.href = "all-works.html";
+            const slug = item.slug || item.title.toLowerCase().replace(/\s+/g, "-");
+            card.href = `/work/?id=${encodeURIComponent(slug)}`;
             card.innerHTML = `
               <img src="${item.image_url}" alt="${item.title}" loading="lazy" />
               <span>${item.title}</span>

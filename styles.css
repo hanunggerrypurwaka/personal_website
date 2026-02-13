@@ -247,12 +247,6 @@ h2 {
   font-weight: 600;
 }
 
-hr {
-  width: 100%;
-  border: none;
-  border-top: 1px solid var(--border-color);
-  margin-top: 32px;
-}
 
 .about {
   display: grid;
@@ -309,7 +303,7 @@ hr {
 
 .card img {
   border-radius: 16px;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 7 / 8;
   object-fit: cover;
   width: 100%;
   display: block;
@@ -411,7 +405,7 @@ hr {
 
 .contact-copy {
   font-size: 1.05rem;
-  line-height: 0.6;
+  line-height: 1.8;
   display: grid;
   gap: 18px;
   justify-items: start;
