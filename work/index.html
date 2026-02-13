@@ -148,9 +148,9 @@
             return item;
           });
           const work = items.find((item) => {
-            const itemSlug =
-              item.slug || item.title.toLowerCase().replace(/\s+/g, "-");
-            return itemSlug === slug;
+            const itemId =
+              item.id || item.title.toLowerCase().replace(/\s+/g, "-");
+            return itemId === slug;
           });
           if (!work) {
             descEl.textContent = "Work not found.";

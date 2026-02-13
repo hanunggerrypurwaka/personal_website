@@ -143,8 +143,8 @@
           visible.forEach((item) => {
             const card = document.createElement("a");
             card.className = "talk-card";
-            const slug = item.slug || item.title.toLowerCase().replace(/\s+/g, "-");
-            card.href = `/talk/?id=${encodeURIComponent(slug)}`;
+            const idValue = item.id || item.title.toLowerCase().replace(/\s+/g, "-");
+            card.href = `/talk/?id=${encodeURIComponent(idValue)}`;
             card.innerHTML = `
               <div class="talk-image">
                 <img src="${item.image_url}" alt="${item.title}" loading="lazy" />
