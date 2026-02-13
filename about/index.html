@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About Me · Hanung Gerry Purwaka</title>
+    <meta name="description" content="About Hanung Gerry Purwaka" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="about-page">
+    <header class="site-header">
+      <div class="container nav-bar">
+        <a class="brand" href="/">
+          <img class="brand-logo" src="/assets/logo.webp" alt="Hello, I'm Gerry" />
+          <span class="brand-name">Hanung Gerry Purwaka</span>
+        </a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          <img src="/assets/hamburger-icon.svg" alt="Open menu" />
+        </button>
+        <nav id="site-nav" class="site-nav">
+          <a href="/">Home</a>
+          <a href="/all-works/">All Works</a>
+          <a href="/talks/">Talks</a>
+          <a href="/about/">About Me</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-intro">
+        <div class="container">
+          <h1>About Me</h1>
+        </div>
+      </section>
+
+      <section class="page-content">
+        <div class="container about-layout">
+          <div class="about-portrait">
+            <img src="/assets/about.webp" alt="Portrait illustration of Gerry" />
+          </div>
+          <div class="about-copy">
+            <p>
+              Hey, I'm <strong>Gerry</strong>, a game designer with 10+ years of
+              experience in mobile games. I'm all about creating fun, intuitive
+              experiences that players actually enjoy.
+            </p>
+            <p>
+              Over the years, I've had the chance to lead multiple game projects
+              from concept to launch, guiding teams through gameplay design,
+              balancing, monetization, and live ops. I've also led a department
+              of game designers, mentoring junior designers, shaping design
+              processes, and helping align creative ideas with business goals. I
+              love the full development cycle and finding that sweet spot
+              between creativity and functionality.
+            </p>
+            <p>
+              Outside of work, I'm into retro games, movies, music, and all
+              things pop culture. This site is where I share my projects,
+              experiments, and whatever else I'm tinkering with.
+            </p>
+            <p><strong>Thanks for stopping by!</strong></p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer">
+      <div class="container footer-bar">
+        <nav class="footer-nav" aria-label="Footer">
+          <a href="/">Home</a>
+          <a href="/all-works/">All Works</a>
+          <a href="/talks/">Talks</a>
+          <a href="/about/">About Me</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+      </div>
+    </footer>
+    <script>
+      const toggle = document.querySelector(".menu-toggle");
+      const nav = document.getElementById("site-nav");
+      if (toggle && nav) {
+        toggle.addEventListener("click", () => {
+          const isOpen = document.body.classList.toggle("nav-open");
+          toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        });
+      }
+    </script>
+  </body>
+</html>

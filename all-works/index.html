@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>All Works · Hanung Gerry Purwaka</title>
+    <meta name="description" content="All works by Hanung Gerry Purwaka" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="talks-page">
+    <header class="site-header">
+      <div class="container nav-bar">
+        <a class="brand" href="/">
+          <img class="brand-logo" src="/assets/logo.webp" alt="Hello, I'm Gerry" />
+          <span class="brand-name">Hanung Gerry Purwaka</span>
+        </a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+          <img src="/assets/hamburger-icon.svg" alt="Open menu" />
+        </button>
+        <nav id="site-nav" class="site-nav">
+          <a href="/">Home</a>
+          <a href="/all-works/">All Works</a>
+          <a href="/talks/">Talks</a>
+          <a href="/about/">About Me</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-intro">
+        <div class="container">
+          <h1>All Works</h1>
+        </div>
+      </section>
+
+      <section class="page-content">
+        <div class="container">
+          <div class="works-filter" role="tablist" aria-label="Filter works">
+            <button class="filter-chip is-active" data-filter="all" type="button">
+              All
+            </button>
+            <button class="filter-chip" data-filter="1" type="button">
+              Shipped Titles
+            </button>
+            <button class="filter-chip" data-filter="2" type="button">
+              Side Projects
+            </button>
+            <button class="filter-chip" data-filter="3" type="button">
+              Creative Exploration
+            </button>
+          </div>
+          <div id="works-grid" class="talks-grid"></div>
+          <p id="works-empty" class="muted" hidden>No works yet.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-bar">
+        <nav class="footer-nav" aria-label="Footer">
+          <a href="/">Home</a>
+          <a href="/all-works/">All Works</a>
+          <a href="/talks/">Talks</a>
+          <a href="/about/">About Me</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script>
+      const toggle = document.querySelector(".menu-toggle");
+      const nav = document.getElementById("site-nav");
+      if (toggle && nav) {
+        toggle.addEventListener("click", () => {
+          const isOpen = document.body.classList.toggle("nav-open");
+          toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        });
+      }
+
+      const SHEET_PUBLISHED_ID =
+        "2PACX-1vQxj47Ft36-DJffBs6j9p-g7DmJSEFnhHq2I91zytwv1QXb4s1kCnhfq63VRx1TyL999_WLp51NitM-";
+      const SHEET_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_PUBLISHED_ID}/pub?output=csv`;
+
+      const worksGrid = document.getElementById("works-grid");
+      const worksEmpty = document.getElementById("works-empty");
+      const filterButtons = Array.from(
+        document.querySelectorAll(".filter-chip")
+      );
+      let allItems = [];
+
+      function parseCsv(text) {
+        const rows = [];
+        let row = [];
+        let field = "";
+        let inQuotes = false;
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i];
+          const next = text[i + 1];
+          if (char === '"') {
+            if (inQuotes && next === '"') {
+              field += '"';
+              i++;
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (char === "," && !inQuotes) {
+            row.push(field);
+            field = "";
+          } else if ((char === "\n" || char === "\r") && !inQuotes) {
+            if (char === "\r" && next === "\n") {
+              i++;
+            }
+            row.push(field);
+            if (row.length > 1 || row[0] !== "") {
+              rows.push(row);
+            }
+            row = [];
+            field = "";
+          } else {
+            field += char;
+          }
+        }
+        if (field.length || row.length) {
+          row.push(field);
+          rows.push(row);
+        }
+        return rows;
+      }
+
+      function normalizeKey(value) {
+        return String(value || "")
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, "_");
+      }
+
+      function renderWorks(filterValue) {
+        if (!allItems.length) {
+          worksEmpty.hidden = false;
+          worksGrid.innerHTML = "";
+          return;
+        }
+        const filtered =
+          filterValue === "all"
+            ? allItems
+            : allItems.filter((item) => item.tag === filterValue);
+        if (!filtered.length) {
+          worksEmpty.hidden = false;
+          worksGrid.innerHTML = "";
+          return;
+        }
+        worksEmpty.hidden = true;
+          worksGrid.innerHTML = "";
+          filtered.forEach((item) => {
+            const card = document.createElement("a");
+            card.className = "card";
+            const slug = item.slug || item.title.toLowerCase().replace(/\s+/g, "-");
+            card.href = `/work/?id=${encodeURIComponent(slug)}`;
+            card.innerHTML = `
+              <img src="${item.image_url}" alt="${item.title}" loading="lazy" />
+              <span>${item.title}</span>
+            `;
+            worksGrid.appendChild(card);
+        });
+      }
+
+      function setActiveFilter(button) {
+        filterButtons.forEach((btn) => btn.classList.remove("is-active"));
+        button.classList.add("is-active");
+      }
+
+      async function loadWorks() {
+        try {
+          const res = await fetch(SHEET_URL);
+          if (!res.ok) throw new Error("Sheet fetch failed");
+          const text = await res.text();
+          const rows = parseCsv(text);
+          if (!rows.length) throw new Error("No data");
+          const headers = rows[0].map(normalizeKey);
+          const items = rows.slice(1).map((row) => {
+            const item = {};
+            headers.forEach((key, index) => {
+              item[key] = row[index] ? row[index].trim() : "";
+            });
+            return item;
+          });
+          allItems = items.filter(
+            (item) => item.title && item.image_url && item.tag
+          );
+          renderWorks("all");
+        } catch (err) {
+          worksEmpty.hidden = false;
+        }
+      }
+
+      filterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          setActiveFilter(button);
+          renderWorks(button.dataset.filter);
+        });
+      });
+
+      loadWorks();
+    </script>
+  </body>
+</html>
