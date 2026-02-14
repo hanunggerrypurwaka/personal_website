@@ -42,10 +42,6 @@
           </p>
           <p>Thanks for stopping by!</p>
           <p class="muted">(Note: I don't actually have 6 arms)</p>
-          <div class="callout">
-            <span class="callout-emoji" aria-hidden="true">🚧</span>
-            <span>Note: This site is under construction</span>
-          </div>
           <a class="btn" href="/contact/">hello@hanungpurwaka.com</a>
         </div>
       </section>
@@ -181,10 +177,15 @@
           .replace(/\s+/g, "_");
       }
 
+      function makeFreshUrl(url) {
+        const separator = url.includes("?") ? "&" : "?";
+        return `${url}${separator}t=${Date.now()}`;
+      }
+
       async function loadWorks() {
         if (!worksGrid) return;
         try {
-          const res = await fetch(WORKS_SHEET_URL);
+          const res = await fetch(makeFreshUrl(WORKS_SHEET_URL));
           if (!res.ok) throw new Error("Sheet fetch failed");
           const text = await res.text();
           const rows = parseCsv(text);
@@ -197,7 +198,9 @@
             });
             return item;
           });
-          const visible = items.filter((item) => item.title && item.image_url);
+          const visible = items.filter(
+            (item) => item.id && item.title && item.image_url
+          );
           if (!visible.length) {
             worksEmpty.hidden = false;
             return;
@@ -206,7 +209,7 @@
           visible.slice(0, 3).forEach((item) => {
             const card = document.createElement("a");
             card.className = "card";
-            const idValue = item.id || item.title.toLowerCase().replace(/\s+/g, "-");
+            const idValue = String(item.id);
             card.href = `/work/?id=${encodeURIComponent(idValue)}`;
             card.innerHTML = `
               <img src="${item.image_url}" alt="${item.title}" loading="lazy" />

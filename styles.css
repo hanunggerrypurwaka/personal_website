@@ -474,6 +474,22 @@ h2 {
   gap: 18px;
 }
 
+#work-description a,
+#talk-description a {
+  color: #1a0dab;
+  text-decoration: underline;
+}
+
+#work-description a:visited,
+#talk-description a:visited {
+  color: #551a8b;
+}
+
+#work-description a:hover,
+#talk-description a:hover {
+  color: #174ea6;
+}
+
 @media (max-width: 720px) {
   .menu-toggle {
     display: inline-flex;

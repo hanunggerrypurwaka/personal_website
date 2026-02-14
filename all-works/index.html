@@ -136,6 +136,20 @@
           .replace(/\s+/g, "_");
       }
 
+      function makeFreshUrl(url) {
+        const separator = url.includes("?") ? "&" : "?";
+        return `${url}${separator}t=${Date.now()}`;
+      }
+
+      function normalizeTagFilterValue(value) {
+        const raw = String(value || "").trim().toLowerCase();
+        if (!raw) return "";
+        if (raw === "1" || raw === "shipped titles") return "1";
+        if (raw === "2" || raw === "side projects") return "2";
+        if (raw === "3" || raw === "creative exploration") return "3";
+        return raw;
+      }
+
       function renderWorks(filterValue) {
         if (!allItems.length) {
           worksEmpty.hidden = false;
@@ -145,7 +159,7 @@
         const filtered =
           filterValue === "all"
             ? allItems
-            : allItems.filter((item) => item.tag === filterValue);
+            : allItems.filter((item) => item.tag_filter === filterValue);
         if (!filtered.length) {
           worksEmpty.hidden = false;
           worksGrid.innerHTML = "";
@@ -156,7 +170,7 @@
           filtered.forEach((item) => {
             const card = document.createElement("a");
             card.className = "card";
-            const idValue = item.id || item.title.toLowerCase().replace(/\s+/g, "-");
+            const idValue = String(item.id);
             card.href = `/work/?id=${encodeURIComponent(idValue)}`;
             card.innerHTML = `
               <img src="${item.image_url}" alt="${item.title}" loading="lazy" />
@@ -173,7 +187,7 @@
 
       async function loadWorks() {
         try {
-          const res = await fetch(SHEET_URL);
+          const res = await fetch(makeFreshUrl(SHEET_URL));
           if (!res.ok) throw new Error("Sheet fetch failed");
           const text = await res.text();
           const rows = parseCsv(text);
@@ -187,8 +201,11 @@
             return item;
           });
           allItems = items.filter(
-            (item) => item.title && item.image_url && item.tag
-          );
+            (item) => item.id && item.title && item.image_url && item.tag
+          ).map((item) => ({
+            ...item,
+            tag_filter: normalizeTagFilterValue(item.tag)
+          }));
           renderWorks("all");
         } catch (err) {
           worksEmpty.hidden = false;
