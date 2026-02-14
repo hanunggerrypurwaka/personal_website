@@ -25,6 +25,12 @@ body {
   background-color: var(--bg-color);
 }
 
+p,
+li,
+.muted {
+  line-height: 1.8;
+}
+
 .contact-page,
 .about-page,
 .talks-page,
