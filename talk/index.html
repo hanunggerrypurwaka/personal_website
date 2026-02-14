@@ -123,6 +123,11 @@
           .replace(/\s+/g, "_");
       }
 
+      function makeFreshUrl(url) {
+        const separator = url.includes("?") ? "&" : "?";
+        return `${url}${separator}t=${Date.now()}`;
+      }
+
       function parseGvizResponse(text) {
         const start = text.indexOf("{");
         const end = text.lastIndexOf("}");
@@ -335,6 +340,18 @@
         return [];
       }
 
+      function getImageSource(item) {
+        if (!item) return "";
+        return String(
+          item.image_url ||
+            item.imageurl ||
+            item.image ||
+            item.data_url ||
+            item.image_src ||
+            ""
+        ).trim();
+      }
+
       function setDescriptionContent(element, formatted, plain, runs, fallbackText) {
         if (Array.isArray(runs) && runs.length) {
           element.innerHTML = "";
@@ -447,7 +464,7 @@
         }
 
         try {
-          const response = await fetch(SHEET_GVIZ_URL);
+          const response = await fetch(makeFreshUrl(SHEET_GVIZ_URL));
           if (!response.ok) throw new Error("gviz fetch failed");
           const text = await response.text();
           const payload = parseGvizResponse(text);
@@ -467,7 +484,7 @@
             return item;
           });
         } catch (_) {
-          const res = await fetch(SHEET_URL);
+          const res = await fetch(makeFreshUrl(SHEET_URL));
           if (!res.ok) throw new Error("Sheet fetch failed");
           const text = await res.text();
           const rows = parseCsv(text);
@@ -485,9 +502,40 @@
         }
       }
 
+      async function fetchTalkItemsFromCsvOnly() {
+        const res = await fetch(makeFreshUrl(SHEET_URL));
+        if (!res.ok) throw new Error("Sheet fetch failed");
+        const text = await res.text();
+        const rows = parseCsv(text);
+        if (!rows.length) throw new Error("No data");
+        const headers = rows[0].map(normalizeKey);
+        return rows.slice(1).map((row) => {
+          const item = {};
+          headers.forEach((key, index) => {
+            const value = row[index] ? row[index].trim() : "";
+            item[key] = value;
+            item[`${key}__formatted`] = value;
+          });
+          return item;
+        });
+      }
+
+      function normalizeId(value) {
+        return decodeURIComponent(String(value || ""))
+          .trim()
+          .replace(/\/+$/, "")
+          .toLowerCase();
+      }
+
+      function findTalkBySlug(items, slug) {
+        const normalizedSlug = normalizeId(slug);
+        if (!normalizedSlug) return null;
+        return items.find((item) => normalizeId(item.id) === normalizedSlug) || null;
+      }
+
       function getSlug() {
         const params = new URLSearchParams(window.location.search);
-        return params.get("id");
+        return normalizeId(params.get("id"));
       }
 
       async function loadTalk() {
@@ -500,15 +548,19 @@
           return;
         }
         try {
-          const items = await fetchSheetItems();
-          const talk = items.find((item) => String(item.id) === String(slug));
+          let items = await fetchSheetItems();
+          let talk = findTalkBySlug(items, slug);
+          if (!talk) {
+            items = await fetchTalkItemsFromCsvOnly();
+            talk = findTalkBySlug(items, slug);
+          }
           if (!talk) {
             descEl.textContent = "Talk not found.";
             return;
           }
           titleEl.textContent = talk.title || "Talk";
           document.title = `${talk.title || "Talk"} · Hanung Gerry Purwaka`;
-          imageEl.src = talk.image_url || "";
+          imageEl.src = getImageSource(talk);
           imageEl.alt = talk.title || "Talk image";
           setDescriptionContent(
             descEl,
@@ -518,7 +570,7 @@
             "Details coming soon."
           );
         } catch (err) {
-          descEl.textContent = "Talk not found.";
+          descEl.textContent = "Unable to load talk. Please refresh.";
         }
       }
 

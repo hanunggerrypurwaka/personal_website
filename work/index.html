@@ -334,6 +334,18 @@
         return [];
       }
 
+      function getImageSource(item) {
+        if (!item) return "";
+        return String(
+          item.image_url ||
+            item.imageurl ||
+            item.image ||
+            item.data_url ||
+            item.image_src ||
+            ""
+        ).trim();
+      }
+
       function setDescriptionContent(element, formatted, plain, runs, fallbackText) {
         if (Array.isArray(runs) && runs.length) {
           element.innerHTML = "";
@@ -484,9 +496,16 @@
         }
       }
 
+      function normalizeId(value) {
+        return decodeURIComponent(String(value || ""))
+          .trim()
+          .replace(/\/+$/, "")
+          .toLowerCase();
+      }
+
       function getSlug() {
         const params = new URLSearchParams(window.location.search);
-        return params.get("id");
+        return normalizeId(params.get("id"));
       }
 
       async function loadWork() {
@@ -500,14 +519,15 @@
         }
         try {
           const items = await fetchSheetItems();
-          const work = items.find((item) => String(item.id) === String(slug));
+          const work =
+            items.find((item) => normalizeId(item.id) === String(slug)) || null;
           if (!work) {
             descEl.textContent = "Work not found.";
             return;
           }
           titleEl.textContent = work.title || "Work";
           document.title = `${work.title || "Work"} · Hanung Gerry Purwaka`;
-          imageEl.src = work.image_url || "";
+          imageEl.src = getImageSource(work);
           imageEl.alt = work.title || "Work image";
           setDescriptionContent(
             descEl,
