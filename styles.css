@@ -475,19 +475,25 @@ h2 {
 }
 
 #work-description a,
-#talk-description a {
-  color: #1a0dab;
-  text-decoration: underline;
+#talk-description a,
+.talk-body #work-description a,
+.talk-body #talk-description a {
+  color: #1a0dab !important;
+  text-decoration: underline !important;
 }
 
 #work-description a:visited,
-#talk-description a:visited {
-  color: #551a8b;
+#talk-description a:visited,
+.talk-body #work-description a:visited,
+.talk-body #talk-description a:visited {
+  color: #551a8b !important;
 }
 
 #work-description a:hover,
-#talk-description a:hover {
-  color: #174ea6;
+#talk-description a:hover,
+.talk-body #work-description a:hover,
+.talk-body #talk-description a:hover {
+  color: #174ea6 !important;
 }
 
 @media (max-width: 720px) {
